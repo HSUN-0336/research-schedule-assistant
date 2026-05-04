@@ -320,6 +320,22 @@ def save_gantt_chart(
             fontsize=9,
         )
 
+    # Add horizontal separator lines between weeks
+    week_keys = [
+        (block["start"].isocalendar().year, block["start"].isocalendar().week)
+        for block in blocks
+    ]
+
+    for i in range(1, len(blocks)):
+        if week_keys[i] != week_keys[i - 1]:
+            ax.axhline(
+                y=i - 0.5,
+                color="gray",
+                linestyle="--",
+                linewidth=1.0,
+                alpha=0.7,
+            )
+
     ax.set_yticks(y_positions)
     ax.set_yticklabels([b["task_name"] for b in blocks], fontsize=9)
     ax.invert_yaxis()
@@ -376,48 +392,3 @@ def save_gantt_chart(
     plt.tight_layout()
     fig.savefig(output_path, dpi=200, bbox_inches="tight")
     plt.close(fig)
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Generate a research project schedule."
-    )
-
-    parser.add_argument(
-        "project_file",
-        type=str,
-        help="Path to project YAML file.",
-    )
-
-    parser.add_argument(
-        "--output-dir",
-        type=str,
-        default="schedules",
-        help="Directory where the schedule files will be saved.",
-    )
-
-    args = parser.parse_args()
-
-    project_path = Path(args.project_file)
-    output_dir = Path(args.output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    project = load_project(project_path)
-    schedule = build_schedule(project)
-
-    markdown = render_markdown(project, schedule)
-
-    slug = project.get("project_slug") or project_path.stem
-
-    markdown_path = output_dir / f"{slug}_schedule.md"
-    gantt_path = output_dir / f"{slug}_gantt.png"
-
-    markdown_path.write_text(markdown, encoding="utf-8")
-    save_gantt_chart(project, schedule, gantt_path)
-
-    print(f"Schedule written to: {markdown_path}")
-    print(f"Gantt chart written to: {gantt_path}")
-
-
-if __name__ == "__main__":
-    main()
