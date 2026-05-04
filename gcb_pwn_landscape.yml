@@ -1,0 +1,63 @@
+project_name: "GCB landscape heterogeneity paper"
+project_slug: "gcb_pwn_landscape"
+project_type: "manuscript"
+deadline: "2026-05-31"
+start_date: "2026-05-05"
+
+current_status:
+  - "Introduction finished"
+  - "Core model results available"
+  - "Methods not yet written"
+  - "Main figures not finalized"
+
+target_journal: "Global Change Biology"
+
+available_time:
+  weekdays_hours: 3
+  weekends_hours: 1
+  low_energy_mode: true
+
+research_summary: >
+  This study uses an individual-based model to evaluate how landscape
+  heterogeneity affects dispersal and model performance for pine wood
+  nematode vector beetles across France, Portugal, and Spain datasets.
+
+main_outputs:
+  - "Complete manuscript draft"
+  - "Main figures"
+  - "Supplementary materials outline"
+  - "Coauthor-ready version"
+
+sections:
+  - name: "Methods: observational data and study area"
+    estimated_hours: 6
+  - name: "Methods: individual-based model development"
+    estimated_hours: 8
+  - name: "Methods: model calibration"
+    estimated_hours: 5
+  - name: "Methods: model validation and comparison"
+    estimated_hours: 5
+  - name: "Figure 1: study area and landscape classification"
+    estimated_hours: 5
+  - name: "Figure 2: IBM conceptual diagram"
+    estimated_hours: 4
+  - name: "Results: calibration and model fit"
+    estimated_hours: 6
+  - name: "Results: heterogeneous vs homogeneous comparison"
+    estimated_hours: 6
+  - name: "Results: dispersal-error structure"
+    estimated_hours: 5
+  - name: "Discussion: main findings"
+    estimated_hours: 5
+  - name: "Discussion: landscape heterogeneity and scale"
+    estimated_hours: 5
+  - name: "Discussion: implications, limitations, and generalization"
+    estimated_hours: 5
+  - name: "Abstract, title, keywords"
+    estimated_hours: 3
+  - name: "Figure captions and tables"
+    estimated_hours: 4
+  - name: "Reference check and formatting"
+    estimated_hours: 3
+  - name: "Final read-through and coauthor version"
+    estimated_hours: 4
