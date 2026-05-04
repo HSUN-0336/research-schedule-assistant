@@ -13,7 +13,7 @@ current_status:
 target_journal: "Global Change Biology"
 
 available_time:
-  weekdays_hours: 4
+  weekdays_hours: 5
   weekends_hours: 0
   low_energy_mode: true
 
