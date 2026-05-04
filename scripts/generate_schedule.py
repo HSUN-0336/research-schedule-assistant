@@ -18,6 +18,8 @@ import yaml
 @dataclass
 class Task:
     name: str
+    base_name: str
+    category: str
     estimated_hours: float
 
 
@@ -25,7 +27,7 @@ class Task:
 class DailyPlan:
     day: date
     capacity_hours: float
-    tasks: list[str]
+    tasks: list[Task]
 
 
 def parse_date(value: str) -> date:
