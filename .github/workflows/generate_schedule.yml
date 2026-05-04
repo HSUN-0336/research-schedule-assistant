@@ -1,6 +1,6 @@
 name: Generate Research Schedule
 
-on:
+'on':
   workflow_dispatch:
   push:
     paths:
