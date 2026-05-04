@@ -1,4 +1,4 @@
-# Research schedule: GCB paper schedule
+# Research schedule: Paper schedule
 
 **Deadline:** 2026-05-28
 **Target:** Global Change Biology
