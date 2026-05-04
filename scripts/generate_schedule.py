@@ -10,7 +10,7 @@ from typing import Any
 
 import matplotlib
 
-matplotlib.use("Agg")  # Required for GitHub Actions
+matplotlib.use("Agg")  # Required for GitHub Actions / headless environments
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import yaml
@@ -226,6 +226,7 @@ def render_markdown(project: dict[str, Any], schedule: list[DailyPlan]) -> str:
     lines.append("")
     lines.append("- The Markdown table provides daily task details.")
     lines.append("- The Gantt chart provides a visual overview of the project timeline.")
+    lines.append("- Horizontal separator lines indicate week boundaries.")
     lines.append("- Weekend work is kept light when weekend capacity is set low.")
     lines.append("- If the schedule is overloaded, reduce scope or increase available hours.")
     lines.append("")
@@ -235,7 +236,7 @@ def render_markdown(project: dict[str, Any], schedule: list[DailyPlan]) -> str:
 
 def build_gantt_blocks(schedule: list[DailyPlan]) -> list[dict[str, Any]]:
     """
-    Group task chunks by their original task name.
+    Group task chunks by original task name.
     This converts daily chunks into Gantt chart blocks.
     """
     grouped: OrderedDict[str, dict[str, Any]] = OrderedDict()
@@ -291,10 +292,17 @@ def save_gantt_chart(
             return category_colors["Final"]
         return category_colors["Other"]
 
-    fig_height = max(5, len(blocks) * 0.6)
+    fig_height = max(6, len(blocks) * 0.6)
     fig, ax = plt.subplots(figsize=(13, fig_height))
 
     y_positions = list(range(len(blocks)))
+
+    # Compute x-limits early so week separator lines can span the full chart
+    x_min = min(mdates.date2num(block["start"]) for block in blocks) - 1
+    x_max = max(
+        max(mdates.date2num(block["end"]) for block in blocks) + 1,
+        mdates.date2num(parse_date(project["deadline"])) + 1,
+    )
 
     for i, block in enumerate(blocks):
         start_num = mdates.date2num(block["start"])
@@ -310,6 +318,7 @@ def save_gantt_chart(
             edgecolor="black",
             linewidth=0.8,
             alpha=0.9,
+            zorder=3,
         )
 
         ax.text(
@@ -318,9 +327,10 @@ def save_gantt_chart(
             f'{block["total_hours"]:.1f} h',
             va="center",
             fontsize=9,
+            zorder=4,
         )
 
-    # Add horizontal separator lines between weeks
+    # Add strong horizontal separator lines between weeks
     week_keys = [
         (block["start"].isocalendar().year, block["start"].isocalendar().week)
         for block in blocks
@@ -328,12 +338,15 @@ def save_gantt_chart(
 
     for i in range(1, len(blocks)):
         if week_keys[i] != week_keys[i - 1]:
-            ax.axhline(
+            ax.hlines(
                 y=i - 0.5,
-                color="gray",
-                linestyle="--",
-                linewidth=1.0,
-                alpha=0.7,
+                xmin=x_min,
+                xmax=x_max,
+                colors="black",
+                linestyles="-",
+                linewidth=1.6,
+                alpha=0.9,
+                zorder=10,
             )
 
     ax.set_yticks(y_positions)
@@ -343,7 +356,6 @@ def save_gantt_chart(
     ax.xaxis_date()
     ax.xaxis.set_major_locator(mdates.WeekdayLocator(interval=1))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d"))
-
     plt.xticks(rotation=45, ha="right")
 
     deadline = parse_date(project["deadline"])
@@ -353,12 +365,14 @@ def save_gantt_chart(
         linestyle="--",
         linewidth=1.5,
         label="Deadline",
+        zorder=5,
     )
 
     ax.set_title(f"Gantt chart: {project['project_name']}", fontsize=14, pad=12)
     ax.set_xlabel("Date")
     ax.set_ylabel("Tasks")
-    ax.grid(axis="x", linestyle="--", alpha=0.35)
+    ax.grid(axis="x", linestyle="--", alpha=0.35, zorder=1)
+    ax.set_xlim(x_min, x_max)
 
     used_categories = []
     for block in blocks:
@@ -367,13 +381,7 @@ def save_gantt_chart(
             used_categories.append(category)
 
     handles = [
-        plt.Rectangle(
-            (0, 0),
-            1,
-            1,
-            color=get_color(category),
-            label=category,
-        )
+        plt.Rectangle((0, 0), 1, 1, color=get_color(category), label=category)
         for category in used_categories
     ]
 
@@ -392,3 +400,48 @@ def save_gantt_chart(
     plt.tight_layout()
     fig.savefig(output_path, dpi=200, bbox_inches="tight")
     plt.close(fig)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Generate a research project schedule."
+    )
+
+    parser.add_argument(
+        "project_file",
+        type=str,
+        help="Path to project YAML file.",
+    )
+
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default="schedules",
+        help="Directory where the schedule files will be saved.",
+    )
+
+    args = parser.parse_args()
+
+    project_path = Path(args.project_file)
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    project = load_project(project_path)
+    schedule = build_schedule(project)
+
+    markdown = render_markdown(project, schedule)
+
+    slug = project.get("project_slug") or project_path.stem
+
+    markdown_path = output_dir / f"{slug}_schedule.md"
+    gantt_path = output_dir / f"{slug}_gantt.png"
+
+    markdown_path.write_text(markdown, encoding="utf-8")
+    save_gantt_chart(project, schedule, gantt_path)
+
+    print(f"Schedule written to: {markdown_path}")
+    print(f"Gantt chart written to: {gantt_path}")
+
+
+if __name__ == "__main__":
+    main()
