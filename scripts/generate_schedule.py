@@ -2,11 +2,16 @@ from __future__ import annotations
 
 import argparse
 import math
+from collections import OrderedDict
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+import matplotlib
+matplotlib.use("Agg")  # 让 GitHub Actions 在无界面环境下也能画图
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import yaml
 
 
