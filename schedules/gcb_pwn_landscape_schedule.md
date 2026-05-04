@@ -54,5 +54,6 @@ This study uses an individual-based model to evaluate how landscape heterogeneit
 
 - The Markdown table provides daily task details.
 - The Gantt chart provides a visual overview of the project timeline.
+- Horizontal separator lines indicate week boundaries.
 - Weekend work is kept light when weekend capacity is set low.
 - If the schedule is overloaded, reduce scope or increase available hours.
