@@ -1,8 +1,8 @@
-project_name: "GCB landscape heterogeneity paper"
+project_name: "GCB paper schedule"
 project_slug: "gcb_pwn_landscape"
 project_type: "manuscript"
-deadline: "2026-05-31"
-start_date: "2026-05-05"
+deadline: "2026-05-28"
+start_date: "2026-05-06"
 
 current_status:
   - "Introduction finished"
@@ -13,8 +13,8 @@ current_status:
 target_journal: "Global Change Biology"
 
 available_time:
-  weekdays_hours: 3
-  weekends_hours: 1
+  weekdays_hours: 4
+  weekends_hours: 0
   low_energy_mode: true
 
 research_summary: >
